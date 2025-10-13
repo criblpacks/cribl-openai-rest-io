@@ -2,15 +2,15 @@ id: default
 groups: {}
 comments: []
 routes:
-  - id: XQMg7P
-    name: Open AI Audit Logs
+  - id: 9uIjY3
+    name: OpenAI
     final: true
     disabled: false
-    pipeline: passthru
+    pipeline: openai
     description: ""
     enableOutputExpression: false
     outputExpression: null
-    filter: __packsource=='cribl-openai-rest.openai-audit-log'
+    filter: "true"
     clones: []
     output: default
   - id: default

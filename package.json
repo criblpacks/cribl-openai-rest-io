@@ -1,1 +1,1 @@
-{"version":"0.0.1","tags":{"streamtags":["openai"],"useCase":["routing","filtering","enrichment"]},"exports":[],"displayName":"Open AI Rest IO","name":"cribl-openai-rest-io","minLogStreamVersion":"4.12.0"}
+{"version":"0.0.1","tags":{"streamtags":[]},"exports":[],"displayName":"cribl-openai-rest-io","name":"cribl-openai-rest-io"}

@@ -68,8 +68,8 @@ openai-audit_log:
       collectUrl: "`https://api.openai.com/v1/organization/audit_logs`"
       collectRequestHeaders:
         - name: Content-Type
-          value: 'application/json'
-        - value: 'Bearer <bearer_token|>'
+          value: "#42:j9r1kCXE8ut6gDCGYLW0pvPTdsusOIWitRBk+mbWvn2wGKSPCoHVmpx7TYAEw5xg"
+        - value: "#42:29arXkWJQNrdrzurPyKe6vGGv5igsZQm5YE6ao2ExVtcmMeE5xddwGOolAqTTx+I"
           name: Authorization
       collectRequestParams:
         - name: effective_at[gt]
@@ -90,8 +90,8 @@ openai-audit_log:
     breakerRulesets:
       - openai
     output: devnull
-    metadata:
-      - name: __packsource
-        value: "'cribl-openai-rest.openai-audit-log'"
   description: Collect OpenAI Logs
-  savedState: {}
+  savedState:
+    restCollectorState:
+      data:
+        latestTime: 1754493802
