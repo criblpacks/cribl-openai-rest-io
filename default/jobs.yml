@@ -68,8 +68,8 @@ openai-audit_log:
       collectUrl: "`https://api.openai.com/v1/organization/audit_logs`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "#42:j9r1kCXE8ut6gDCGYLW0pvPTdsusOIWitRBk+mbWvn2wGKSPCoHVmpx7TYAEw5xg"
-        - value: "#42:29arXkWJQNrdrzurPyKe6vGGv5igsZQm5YE6ao2ExVtcmMeE5xddwGOolAqTTx+I"
+          value: "`application/json`"
+        - value: "`changeme`"
           name: Authorization
       collectRequestParams:
         - name: effective_at[gt]
