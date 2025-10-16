@@ -1,0 +1,6 @@
+id: cribl_openai_audit_log_types.csv
+size: 56
+mode: memory
+description: A list of OpenAI Audit log types to drop
+version: u64wmuyi
+rows: 2

@@ -2,15 +2,50 @@ id: default
 groups: {}
 comments: []
 routes:
-  - id: 9uIjY3
-    name: OpenAI
+  - id: gfF9bl
+    name: Open AI Audit Logs
     final: true
     disabled: false
-    pipeline: openai
+    pipeline: cribl_openai_audit_log
     description: ""
     enableOutputExpression: false
     outputExpression: null
-    filter: "true"
+    filter: __packsource == 'cribl-openai-rest.openai-audit-log'
+    clones: []
+    output: default
+  - id: 7GVv0q
+    name: Open AI Cost Logs
+    final: true
+    disabled: false
+    pipeline: cribl_openai_costs
+    description: ""
+    enableOutputExpression: false
+    outputExpression: null
+    filter: __packsource == 'cribl-openai-rest.openai-costs'
+    clones: []
+    output: default
+  - id: pE8lhs
+    name: OpenAI Usage Logs
+    final: true
+    disabled: false
+    pipeline: cribl_openai_usage_data
+    description: ""
+    enableOutputExpression: false
+    outputExpression: null
+    filter: __packsource.includes('cribl-openai-rest') &&
+      __packsource.includes('usage')
+    clones: []
+    output: default
+  - id: ZvOU4l
+    name: OpenAI Objects
+    final: true
+    disabled: false
+    pipeline: cribl_openai_objects
+    description: ""
+    enableOutputExpression: false
+    outputExpression: null
+    filter: __packsource.includes('openai-users') ||
+      __packsource.includes('openai-projects')
     clones: []
     output: default
   - id: default

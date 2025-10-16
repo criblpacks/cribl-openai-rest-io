@@ -1,4 +1,5 @@
-openai:
+OpenAI API Ruleset:
+  lib: custom
   minRawLength: 256
   rules:
     - condition: _raw.includes('organization.audit_log')
@@ -10,7 +11,7 @@ openai:
       timestampTimezone: local
       timestampEarliest: -420weeks
       timestampLatest: +1week
-      maxEventBytes: 51200
+      maxEventBytes: 134217728
       disabled: false
       parserEnabled: false
       shouldUseDataRaw: false
@@ -18,4 +19,56 @@ openai:
       eventBreakerRegex: /[\n\r]+(?!\s)/
       name: audit_log
       jsonArrayField: data
-  lib: custom
+      fields:
+        - name: __first_id
+          value: first_id
+        - name: __last_id
+          value: last_id
+    - condition: _raw.includes('end_time_iso')
+      type: json_array
+      timestampAnchorRegex: /end_time_iso/
+      timestamp:
+        type: auto
+        length: 150
+      timestampTimezone: UTC
+      timestampEarliest: -420weeks
+      timestampLatest: +1week
+      maxEventBytes: 134217728
+      disabled: false
+      parserEnabled: false
+      shouldUseDataRaw: false
+      jsonExtractAll: false
+      eventBreakerRegex: /[\n\r]+(?!\s)/
+      name: completions
+    - condition: "true"
+      type: json_array
+      timestampAnchorRegex: /end_time/
+      timestamp:
+        type: auto
+        length: 150
+      timestampTimezone: UTC
+      timestampEarliest: -420weeks
+      timestampLatest: +1week
+      maxEventBytes: 51200
+      disabled: false
+      parserEnabled: false
+      shouldUseDataRaw: false
+      jsonExtractAll: false
+      eventBreakerRegex: /[\n\r]+(?!\s)/
+      name: other_logs
+    - condition: "true"
+      type: json_array
+      timestampAnchorRegex: /^/
+      timestamp:
+        type: current
+        length: 150
+      timestampTimezone: local
+      timestampEarliest: -420weeks
+      timestampLatest: +1week
+      maxEventBytes: 134217728
+      disabled: false
+      parserEnabled: false
+      shouldUseDataRaw: false
+      jsonExtractAll: false
+      eventBreakerRegex: /[\n\r]+(?!\s)/
+      name: default

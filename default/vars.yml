@@ -1,0 +1,13 @@
+cribl_openai_enable_audit_log_drop:
+  type: boolean
+  lib: custom
+  value: "false"
+cribl_openai_drop_empty_usage_detail_events:
+  type: boolean
+  lib: custom
+  value: |
+    false
+openai_splunk_default_index:
+  type: string
+  lib: custom
+  value: "'openai'"

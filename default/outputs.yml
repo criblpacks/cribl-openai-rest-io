@@ -1,5 +1,5 @@
 outputs:
-  splunk-hec:
+  DefaultSplunk:
     systemFields:
       - cribl_pipe
     streamtags: []

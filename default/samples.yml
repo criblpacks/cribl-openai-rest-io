@@ -1,0 +1,26 @@
+9iD7o9:
+  sampleName: cribl_openai_completions
+  ttl: 0
+  created: 1760486410597
+  size: 36883
+  numEvents: 24
+KRVAnx:
+  sampleName: cribl_openai_costs
+  created: 1760631190759
+  size: 16476
+  numEvents: 30
+y8Zf70:
+  sampleName: cribl_openai_audit
+  created: 1760631860841
+  size: 91467
+  numEvents: 100
+jYIvQG:
+  sampleName: cribl_openai_projects
+  created: 1760654678726
+  size: 810
+  numEvents: 2
+thSZIw:
+  sampleName: cribl_openai_users
+  created: 1760654830237
+  size: 2026
+  numEvents: 5

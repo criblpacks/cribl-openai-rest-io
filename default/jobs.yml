@@ -1,11 +1,11 @@
-openai-audit_log:
+in_openai_completions_1h:
   type: collection
   ttl: 4h
   ignoreGroupJobsLimit: false
   removeFields: []
   resumeOnBoot: false
   schedule:
-    cronSchedule: "*/15 * * * *"
+    cronSchedule: 3 7 * * *
     maxConcurrentRuns: 1
     skippable: true
     run:
@@ -26,7 +26,7 @@ openai-audit_log:
           prevState : newState"
         enabled: true
       earliest: -1d
-    enabled: true
+    enabled: false
   streamtags: []
   workerAffinity: false
   collector:
@@ -65,18 +65,20 @@ openai-audit_log:
       loginBody: '`{ "username": "${username}", "password": "${password}" }`'
       authHeaderKey: Authorization
       authHeaderExpr: "`Bearer ${token}`"
-      collectUrl: "`https://api.openai.com/v1/organization/audit_logs`"
+      collectUrl: "`https://api.openai.com/v1/organization/usage/completions`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "`application/json`"
-        - value: "`changeme`"
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
           name: Authorization
       collectRequestParams:
-        - name: effective_at[gt]
-          value: "`${Math.round(state.latestTime ? state.latestTime : (earliest ? earliest
-            : Date.now()/1000 - 86400))}`"
+        - name: start_time
+          value: "`${Math.round(state.latestTime ? (state.latestTime - (60*60*24)) :
+            (Date.now()/1000 - (60*60*24)))}`"
         - name: limit
-          value: "100"
+          value: "24"
+        - name: bucket_width
+          value: "'1h'"
     destructive: false
     encoding: utf8
     type: rest
@@ -88,10 +90,943 @@ openai-audit_log:
       disabled: true
     throttleRatePerSec: "0"
     breakerRulesets:
-      - openai
+      - OpenAI API Ruleset
     output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-usage-completions'"
+      - name: bucket_width
+        value: "'1h'"
   description: Collect OpenAI Logs
-  savedState:
-    restCollectorState:
-      data:
-        latestTime: 1754493802
+  savedState: {}
+  notifications: []
+in_openai_audit_log:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: "*/5 * * * *"
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: true
+      earliest: -1d
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: response_body
+        maxPages: 0
+        offsetField: offset
+        limitField: limit
+        limit: 50
+        zeroIndexed: false
+        lastPageExpr: has_more == false
+        attribute:
+          - last_id
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      scopes:
+        - https://www.googleapis.com/auth/admin.reports.audit.readonly
+      loginUrl: "`https://localhost:9000/api/v1/auth/login`"
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      collectUrl: "`https://api.openai.com/v1/organization/audit_logs`"
+      collectRequestHeaders:
+        - name: Content-Type
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
+          name: Authorization
+      collectRequestParams:
+        - name: effective_at[gt]
+          value: "`${Math.round(state.latestTime ? state.latestTime : (earliest ? earliest
+            : Date.now()/1000 - (60*60*24*90)))}`"
+        - name: limit
+          value: "100"
+        - name: after
+          value: "`${last_id}`"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - OpenAI API Ruleset
+    output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-audit-log'"
+  description: Collect OpenAI Logs
+  savedState: {}
+  notifications: []
+in_openai_costs_1d:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 1 7 * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: true
+      earliest: -1d
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: none
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      scopes:
+        - https://www.googleapis.com/auth/admin.reports.audit.readonly
+      loginUrl: "`https://localhost:9000/api/v1/auth/login`"
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      collectUrl: "`https://api.openai.com/v1/organization/costs`"
+      collectRequestHeaders:
+        - name: Content-Type
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
+          name: Authorization
+      collectRequestParams:
+        - name: start_time
+          value: "`${Math.round(state.latestTime ? (state.latestTime - (60*60*24)) :
+            (Date.now()/1000 - (60*60*24)))}`"
+        - name: limit
+          value: "1"
+        - name: bucket_width
+          value: "'1d'"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - OpenAI API Ruleset
+    output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-costs'"
+      - name: bucket_width
+        value: "'1d'"
+  description: Collect OpenAI Logs
+  savedState: {}
+  notifications: []
+in_openai_embeddings_1h:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 3 7 * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: true
+      earliest: -1d
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: none
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      scopes:
+        - https://www.googleapis.com/auth/admin.reports.audit.readonly
+      loginUrl: "`https://localhost:9000/api/v1/auth/login`"
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      collectUrl: "`https://api.openai.com/v1/organization/usage/embeddings`"
+      collectRequestHeaders:
+        - name: Content-Type
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
+          name: Authorization
+      collectRequestParams:
+        - name: start_time
+          value: "`${Math.round(state.latestTime ? (state.latestTime - (60*60*24)) :
+            (Date.now()/1000 - (60*60*24)))}`"
+        - name: limit
+          value: "24"
+        - name: bucket_width
+          value: "'1h'"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - OpenAI API Ruleset
+    output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-usage-embeddings'"
+      - name: bucket_width
+        value: "'1h'"
+  description: Collect OpenAI Logs
+  savedState: {}
+  notifications: []
+in_openai_moderations_1h:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 3 7 * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: true
+      earliest: -1d
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: none
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      scopes:
+        - https://www.googleapis.com/auth/admin.reports.audit.readonly
+      loginUrl: "`https://localhost:9000/api/v1/auth/login`"
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      collectUrl: "`https://api.openai.com/v1/organization/usage/moderations`"
+      collectRequestHeaders:
+        - name: Content-Type
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
+          name: Authorization
+      collectRequestParams:
+        - name: start_time
+          value: "`${Math.round(state.latestTime ? (state.latestTime - (60*60*24)) :
+            (Date.now()/1000 - (60*60*24)))}`"
+        - name: limit
+          value: "24"
+        - name: bucket_width
+          value: "'1h'"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - OpenAI API Ruleset
+    output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-usage-moderations'"
+      - name: bucket_width
+        value: "'1h'"
+  description: Collect OpenAI Logs
+  savedState: {}
+  notifications: []
+in_openai_images_1h:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 3 7 * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: true
+      earliest: -1d
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: none
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      scopes:
+        - https://www.googleapis.com/auth/admin.reports.audit.readonly
+      loginUrl: "`https://localhost:9000/api/v1/auth/login`"
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      collectUrl: "`https://api.openai.com/v1/organization/usage/images`"
+      collectRequestHeaders:
+        - name: Content-Type
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
+          name: Authorization
+      collectRequestParams:
+        - name: start_time
+          value: "`${Math.round(state.latestTime ? (state.latestTime - (60*60*24)) :
+            (Date.now()/1000 - (60*60*24)))}`"
+        - name: limit
+          value: "24"
+        - name: bucket_width
+          value: "'1h'"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - OpenAI API Ruleset
+    output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-usage-images'"
+      - name: bucket_width
+        value: "'1h'"
+  description: Collect OpenAI Logs
+  savedState: {}
+  notifications: []
+in_openai_audio_speeches_1h:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 2 7 * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: true
+      earliest: -1d
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: none
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      scopes:
+        - https://www.googleapis.com/auth/admin.reports.audit.readonly
+      loginUrl: "`https://localhost:9000/api/v1/auth/login`"
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      collectUrl: "`https://api.openai.com/v1/organization/usage/audio_speeches`"
+      collectRequestHeaders:
+        - name: Content-Type
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
+          name: Authorization
+      collectRequestParams:
+        - name: start_time
+          value: "`${Math.round(state.latestTime ? (state.latestTime - (60*60*24)) :
+            (Date.now()/1000 - (60*60*24)))}`"
+        - name: limit
+          value: "24"
+        - name: bucket_width
+          value: "'1h'"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - OpenAI API Ruleset
+    output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-usage-audio_speeches'"
+      - name: bucket_width
+        value: "'1h'"
+  description: Collect OpenAI Logs
+  savedState: {}
+  notifications: []
+in_openai_audio_transcriptions_1h:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 2 7 * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: true
+      earliest: -1d
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: none
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      scopes:
+        - https://www.googleapis.com/auth/admin.reports.audit.readonly
+      loginUrl: "`https://localhost:9000/api/v1/auth/login`"
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      collectUrl: "`https://api.openai.com/v1/organization/usage/audio_transcriptions`"
+      collectRequestHeaders:
+        - name: Content-Type
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
+          name: Authorization
+      collectRequestParams:
+        - name: start_time
+          value: "`${Math.round(state.latestTime ? (state.latestTime - (60*60*24)) :
+            (Date.now()/1000 - (60*60*24)))}`"
+        - name: limit
+          value: "24"
+        - name: bucket_width
+          value: "'1h'"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - OpenAI API Ruleset
+    output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-usage-audio_transcriptions'"
+      - name: bucket_width
+        value: "'1h'"
+  description: Collect OpenAI Logs
+  savedState: {}
+  notifications: []
+in_openai_users:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 2 7 * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: false
+      earliest: -1d
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: response_body
+        maxPages: 0
+        offsetField: offset
+        limitField: limit
+        limit: 50
+        zeroIndexed: false
+        lastPageExpr: has_more == false
+        attribute:
+          - last_id
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      scopes:
+        - https://www.googleapis.com/auth/admin.reports.audit.readonly
+      loginUrl: "`https://localhost:9000/api/v1/auth/login`"
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      collectUrl: "`https://api.openai.com/v1/organization/users`"
+      collectRequestHeaders:
+        - name: Content-Type
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
+          name: Authorization
+      collectRequestParams:
+        - name: limit
+          value: "100"
+        - name: after
+          value: "`${last_id}`"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - OpenAI API Ruleset
+    output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-users'"
+  description: Collect OpenAI Logs
+  savedState: {}
+  notifications: []
+in_openai_projects:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 3 7 * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: false
+      earliest: -1d
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: response_body
+        maxPages: 0
+        offsetField: offset
+        limitField: limit
+        limit: 50
+        zeroIndexed: false
+        lastPageExpr: has_more == false
+        attribute:
+          - last_id
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      scopes:
+        - https://www.googleapis.com/auth/admin.reports.audit.readonly
+      loginUrl: "`https://localhost:9000/api/v1/auth/login`"
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      collectUrl: "`https://api.openai.com/v1/organization/projects`"
+      collectRequestHeaders:
+        - name: Content-Type
+          value: "'application/json'"
+        - value: "'Bearer <your_api_token'"
+          name: Authorization
+      collectRequestParams:
+        - name: limit
+          value: "100"
+        - name: after
+          value: "`${last_id}`"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - OpenAI API Ruleset
+    output: devnull
+    metadata:
+      - name: __packsource
+        value: "'cribl-openai-rest.openai-projects'"
+  description: Collect OpenAI Logs
+  savedState: {}
+  notifications: []

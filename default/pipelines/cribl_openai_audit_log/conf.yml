@@ -1,0 +1,96 @@
+output: default
+streamtags: []
+groups:
+  sGt6Hw:
+    name: Optional event filtering by audit log "type"
+    description: Set cribl_openai_enable_audit_log_drop to enable
+    index: 3
+  81PQ4K:
+    name: Splunk Output
+    description: Enable to format data for Splunk
+    disabled: true
+    index: 4
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Parse OpenAI Audit Logs
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: serde
+    filter: "true"
+    disabled: null
+    conf:
+      mode: extract
+      type: json
+      srcField: _raw
+  - id: lookup
+    filter: "true"
+    disabled: null
+    conf:
+      dbLookup: false
+      matchMode: exact
+      reloadPeriodSec: -1
+      inFields:
+        - eventField: type
+          lookupField: type
+      addToEvent: false
+      ignoreCase: false
+      matchType: first
+      file: cribl_openai_audit_log_types.csv
+      outFields:
+        - lookupField: action
+          eventField: __action
+    groupId: sGt6Hw
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Set C.vars.cribl_openai_enable_audit_log_drop to "true" to enable event
+        dropping
+    groupId: sGt6Hw
+  - id: drop
+    filter: C.vars.cribl_openai_enable_audit_log_drop && __action=='drop'
+    disabled: null
+    conf: {}
+    groupId: sGt6Hw
+  - id: serialize
+    filter: "true"
+    disabled: true
+    conf:
+      type: json
+      dstField: _raw
+      fields:
+        - "!cribl_*"
+        - "!_*"
+        - "!host"
+        - "!source"
+        - "*"
+    groupId: 81PQ4K
+  - id: eval
+    filter: "true"
+    disabled: true
+    conf:
+      keep:
+        - cribl_*
+        - host
+        - source
+        - sourcetype
+        - index
+        - _*
+      remove:
+        - "*"
+      add:
+        - disabled: false
+          name: sourcetype
+          value: sourcetype || 'openai:audit'
+        - disabled: false
+          name: index
+          value: index || C.vars.openai_splunk_default_index
+    groupId: 81PQ4K
+description: ""

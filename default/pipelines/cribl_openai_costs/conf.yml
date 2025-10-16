@@ -1,0 +1,83 @@
+output: default
+streamtags: []
+groups:
+  knmy4q:
+    name: Optional dropping of empty cost details events
+    index: 3
+  81PQ4K:
+    name: Splunk Output
+    description: Enable to format data for Splunk
+    disabled: true
+    index: 4
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Parse OpenAI Audit Cost Logs
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: serde
+    filter: "true"
+    disabled: null
+    conf:
+      mode: extract
+      type: json
+      srcField: _raw
+      fieldFilterExpr: value !== '' && value !== null
+  - id: code
+    filter: "true"
+    disabled: null
+    conf:
+      maxNumOfIterations: 5000
+      activeLogSampleRate: 1
+      useUniqueLogChannel: true
+      code: >-
+        // Set a flag if the results array is empty
+
+        __e['results'].length == 0 ? __e['no_results'] = true : __e['no_results'] = false
+    groupId: knmy4q
+  - id: drop
+    filter: C.vars.cribl_openai_drop_empty_usage_detail_events && no_results
+    disabled: null
+    conf: {}
+    groupId: knmy4q
+  - id: serialize
+    filter: "true"
+    disabled: true
+    conf:
+      type: json
+      dstField: _raw
+      fields:
+        - "!cribl_*"
+        - "!_*"
+        - "!host"
+        - "!source"
+        - "*"
+    groupId: 81PQ4K
+  - id: eval
+    filter: "true"
+    disabled: true
+    conf:
+      keep:
+        - cribl_*
+        - host
+        - source
+        - sourcetype
+        - index
+        - _*
+      remove:
+        - "*"
+      add:
+        - disabled: false
+          name: sourcetype
+          value: sourcetype || 'openai:costs'
+        - disabled: false
+          name: index
+          value: index || C.vars.openai_splunk_default_index
+    groupId: 81PQ4K
+description: ""

@@ -1,0 +1,64 @@
+output: default
+streamtags: []
+groups:
+  9fBCkA:
+    name: Enable to format data for Splunk
+    disabled: true
+    index: 3
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Process OpenAI "object" data like Users, Projects, etc
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: serde
+    filter: "true"
+    disabled: null
+    conf:
+      mode: extract
+      type: json
+      srcField: _raw
+      fieldFilterExpr: value !== '' && value !== null
+  - id: serialize
+    filter: "true"
+    disabled: true
+    conf:
+      type: json
+      dstField: _raw
+      fields:
+        - "!cribl_*"
+        - "!_*"
+        - "!host"
+        - "!source"
+        - "*"
+    groupId: 9fBCkA
+  - id: eval
+    filter: "true"
+    disabled: true
+    conf:
+      keep:
+        - cribl_*
+        - host
+        - source
+        - sourcetype
+        - index
+        - _*
+      remove:
+        - "*"
+      add:
+        - disabled: false
+          name: sourcetype
+          value: "sourcetype || __packsource.includes('openai-users') ? 'openai:users' :
+            __packsource.includes('openai-projects') ? 'openai:projects' :
+            'openai:other'"
+        - disabled: false
+          name: index
+          value: index || C.vars.openai_splunk_default_index
+    groupId: 9fBCkA
+description: Process data like Users, Projects, etc
