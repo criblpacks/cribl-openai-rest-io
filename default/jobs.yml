@@ -69,7 +69,7 @@ in_openai_completions_1h:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -179,7 +179,7 @@ in_openai_audit_log:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: effective_at[gt]
@@ -279,7 +279,7 @@ in_openai_costs_1d:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -381,7 +381,7 @@ in_openai_embeddings_1h:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -483,7 +483,7 @@ in_openai_moderations_1h:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -585,7 +585,7 @@ in_openai_images_1h:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -687,7 +687,7 @@ in_openai_audio_speeches_1h:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -789,7 +789,7 @@ in_openai_audio_transcriptions_1h:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -899,7 +899,7 @@ in_openai_users:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: limit
@@ -1004,7 +1004,7 @@ in_openai_projects:
       collectRequestHeaders:
         - name: Content-Type
           value: "'application/json'"
-        - value: "'Bearer <your_api_token'"
+        - value: "'Bearer <your_api_token>'"
           name: Authorization
       collectRequestParams:
         - name: limit
