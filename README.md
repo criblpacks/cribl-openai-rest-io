@@ -24,7 +24,6 @@ The Pack includes (optional) Splunk output processing that maps OpenAI data to t
 * All Usage Details data: `sourcetype=openai:bucket_data`
 
 
-
 ## Deployment
 
 * This pack is configured by default to use the Worker Group's *Default Destination*.
@@ -33,6 +32,8 @@ The Pack includes (optional) Splunk output processing that maps OpenAI data to t
 * For immediate functionality without requiring Pack route filter expression modifications, every bundled Source within this pack adds a hidden field: `__packsource`. This field allows for seamless routing based on the Pack source.
 
 ### Configure the Collectors
+
+*Note on Collector naming: Collectors ending in `_1h` collect 24 one hour "bucket widths" of data once/day. If you want to collect other widths, clone the collector and modify the bucket_width, limit, and schedule. See documentation links above for options.*
 
 * Obtain an [OpenAI API Key](https://platform.openai.com/settings/organization/api-keys) from your Administrator.
 * For each Collector, update the Collect Header named `Authorization` to include your API Key. It must be a Javascript string in the format `'Bearer <your_api_token'`.
@@ -43,12 +44,6 @@ The Pack includes (optional) Splunk output processing that maps OpenAI data to t
 
 ### Configure your Destination/Update Pack Routes
 To ensure proper data routing, you must make a choice: retain the current setting to use the Default Destination defined by your Worker Group, or define a new Destination directly inside this pack and adjust the pack's route accordingly.
-
-This Pack includes a Splunk HEC Output. To configure it:
-
-* Create a [HEC token in Splunk](https://help.splunk.com/en/splunk-enterprise/get-started/get-data-in/10.0/get-data-with-http-event-collector/set-up-and-use-http-event-collector-in-splunk-web).
-* Populate the **Splunk HEC Endpoints** parameter with the Splunk HEC URL.
-* Populate the **HEC Auth token** with the token created in Splunk
 
 ### Commit and Deploy
 Once everything is configured, perform a Commit & Deploy to enable data collection.
