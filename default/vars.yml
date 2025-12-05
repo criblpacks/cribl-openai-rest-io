@@ -11,3 +11,8 @@ openai_splunk_default_index:
   type: string
   lib: custom
   value: "'openai'"
+openai_api_token:
+  type: string
+  lib: custom
+  description: "REQUIRED: OpenAI API token"
+  value: "'YOUR_API_TOKEN'"

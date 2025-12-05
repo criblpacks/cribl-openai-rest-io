@@ -68,8 +68,8 @@ in_openai_completions_1h:
       collectUrl: "`https://api.openai.com/v1/organization/usage/completions`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -153,6 +153,7 @@ in_openai_audit_log:
       decodeUrl: false
       rejectUnauthorized: true
       captureHeaders: false
+      stopOnEmptyResults: false
       safeHeaders: []
       retryRules:
         type: backoff
@@ -178,8 +179,8 @@ in_openai_audit_log:
       collectUrl: "`https://api.openai.com/v1/organization/audit_logs`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: effective_at[gt]
@@ -278,8 +279,8 @@ in_openai_costs_1d:
       collectUrl: "`https://api.openai.com/v1/organization/costs`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -380,8 +381,8 @@ in_openai_embeddings_1h:
       collectUrl: "`https://api.openai.com/v1/organization/usage/embeddings`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -482,8 +483,8 @@ in_openai_moderations_1h:
       collectUrl: "`https://api.openai.com/v1/organization/usage/moderations`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -584,8 +585,8 @@ in_openai_images_1h:
       collectUrl: "`https://api.openai.com/v1/organization/usage/images`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -686,8 +687,8 @@ in_openai_audio_speeches_1h:
       collectUrl: "`https://api.openai.com/v1/organization/usage/audio_speeches`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -788,8 +789,8 @@ in_openai_audio_transcriptions_1h:
       collectUrl: "`https://api.openai.com/v1/organization/usage/audio_transcriptions`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: start_time
@@ -898,8 +899,8 @@ in_openai_users:
       collectUrl: "`https://api.openai.com/v1/organization/users`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: limit
@@ -1003,8 +1004,8 @@ in_openai_projects:
       collectUrl: "`https://api.openai.com/v1/organization/projects`"
       collectRequestHeaders:
         - name: Content-Type
-          value: "'application/json'"
-        - value: "'Bearer <your_api_token>'"
+          value: changeme
+        - value: changeme
           name: Authorization
       collectRequestParams:
         - name: limit
