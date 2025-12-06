@@ -36,7 +36,8 @@ The Pack includes (optional) Splunk output processing that maps OpenAI data to t
 *Note on Collector naming: Collectors ending in `_1h` collect 24 one hour "bucket widths" of data once/day. If you want to collect other widths, clone the collector and modify the bucket_width, limit, and schedule. See documentation links above for options.*
 
 * Obtain an [OpenAI API Key](https://platform.openai.com/settings/organization/api-keys) from your Administrator.
-* For each Collector, update the Collect Header named `Authorization` to include your API Key. It must be a Javascript string in the format `'Bearer <your_api_token'`.
+* Set the `openai_api_token` variable to this value.
+* Perform a Commit/Deploy (otherwise Preview may throw errors).
 * Perform a Run > Preview to verify that each Collector works correctly.
 * Schedule data ingestion by clicking the **Schedule** button under the Actions column of the Collector and toggle the **Enabled** button to enable data flow. Collectors requiring State Tracking have it enabled by default. Modify the cron schedule if required:
   * The default for Audit Log data is to run every 5 minutes. 
@@ -46,7 +47,7 @@ The Pack includes (optional) Splunk output processing that maps OpenAI data to t
 To ensure proper data routing, you must make a choice: retain the current setting to use the Default Destination defined by your Worker Group, or define a new Destination directly inside this pack and adjust the pack's route accordingly.
 
 ### Commit and Deploy
-Once everything is configured, perform a Commit & Deploy to enable data collection.
+Once everything is configured, perform a Commit & Deploy to enable data collection (if changes have been made).
 
 ## Pack Configurable Items 
 The following are the in-Pack configurable items - review/update them as needed. 
@@ -59,6 +60,7 @@ The `cribl_openai_audit_log_types.csv` is used to configure OpenAI audit log `ty
 ### Variables
 
 The Pack has the following variables:
+* `openai_api_token`: Your OpenAI API token
 * `cribl_openai_enable_audit_log_drop`: Set to `true` to enable audit log reduction.
 * `cribl_openai_drop_empty_usage_detail_events`: Set to `true` to drop usage detail events that have no results. 
 * `openai_splunk_default_index`: Default index for the Splunk output - defaults to `openai`.
@@ -69,9 +71,12 @@ Upgrading certain Cribl Packs using the same Pack ID can have unintended consequ
 
 ## Release Notes
 
+### Version 1.1.0
+- Collectors are now configured via variables
+- Audit log Collector is pre-scheduled
 
 ### Version 1.0.0
-Initial release
+- Initial release
 
 ## Contributing to the Pack
 
