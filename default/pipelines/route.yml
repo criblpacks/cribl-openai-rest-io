@@ -12,7 +12,8 @@ routes:
     outputExpression: null
     filter: __packsource == 'cribl-openai-rest.openai-audit-log'
     clones: []
-    output: default
+    targetContext: group
+    output: __group
   - id: 7GVv0q
     name: Open AI Cost Logs
     final: true
@@ -23,7 +24,8 @@ routes:
     outputExpression: null
     filter: __packsource == 'cribl-openai-rest.openai-costs'
     clones: []
-    output: default
+    targetContext: group
+    output: __group
   - id: pE8lhs
     name: OpenAI Usage Logs
     final: true
@@ -35,7 +37,8 @@ routes:
     filter: __packsource.includes('cribl-openai-rest') &&
       __packsource.includes('usage')
     clones: []
-    output: default
+    targetContext: group
+    output: __group
   - id: ZvOU4l
     name: OpenAI Objects
     final: true
@@ -47,7 +50,8 @@ routes:
     filter: __packsource.includes('openai-users') ||
       __packsource.includes('openai-projects')
     clones: []
-    output: default
+    targetContext: group
+    output: __group
   - id: default
     name: default
     final: true

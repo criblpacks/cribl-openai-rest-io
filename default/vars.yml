@@ -1,8 +1,8 @@
 openai_api_token:
-  type: string
+  type: encryptedString
   lib: custom
   description: "REQUIRED: OpenAI API token"
-  value: "'YOUR_API_TOKEN'"
+  value: "YOUR_API_TOKEN"
 cribl_openai_enable_audit_log_drop:
   type: boolean
   lib: custom

@@ -128,7 +128,7 @@ in_openai_audit_log:
           prevState : newState"
         enabled: true
       earliest: -1d
-    enabled: true
+    enabled: false
   streamtags: []
   workerAffinity: false
   collector:
